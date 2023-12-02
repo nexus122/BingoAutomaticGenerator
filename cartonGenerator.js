@@ -51,7 +51,7 @@ const generateHTML = (bingoCard) => {
           width: ${cellSize};
           height: ${cellSize};
           box-sizing: border-box;
-          border: none;  /* Eliminar bordes */
+          border: 1px solid black;  /* Eliminar bordes */
           font-family: 'Arial', sans-serif; /* Cambiar la fuente a Arial */
         }
       </style>
@@ -72,6 +72,11 @@ const generateHTML = (bingoCard) => {
 const generateImage = async (html, outputPath) => {
     const browser = await puppeteer.launch();
     const page = await browser.newPage();
+    await page.setViewport({
+        width: 560, // Ancho en píxeles
+        height: 560,  // Altura en píxeles
+        deviceScaleFactor: 1, // Factor de escala (puede ajustarse según sea necesario)
+      });
     await page.setContent(html);
 
     const screenshot = await page.screenshot({ omitBackground: true }); // Omitir fondo blanco
@@ -174,8 +179,8 @@ const songList = [
     'pporappippam - SUNMI'
 ];
 
-const generateBingoImages = async () => {
-    for (let i = 0; i < 100; i++) {  // Cambia 5 por el número de cartones que deseas generar
+const generateBingoImages = async (cards) => {
+    for (let i = 0; i < cards; i++) {  // Cambia 5 por el número de cartones que deseas generar
         const bingoCard = generateBingoCard(songList);
         const html = generateHTML(bingoCard);
         const outputPath = `bingo_card_${i + 1}.png`;
@@ -184,24 +189,4 @@ const generateBingoImages = async () => {
     }
 };
 
-function calculateDuplicateProbability(numSongs, numCards, gridSize) {
-    const numCombinations = Math.pow(numSongs, gridSize * gridSize);
-    let probabilityNoDuplicate = 1;
-  
-    for (let i = 1; i <= numCards; i++) {
-      probabilityNoDuplicate *= (numCombinations - i + 1) / numCombinations;
-    }
-  
-    const probabilityDuplicate = 1 - probabilityNoDuplicate;
-    return probabilityDuplicate;
-  }
-  
-  const numSongs = 92;
-  const numCards = 100;
-  const gridSize = 4;
-  
-  const probability = calculateDuplicateProbability(numSongs, numCards, gridSize);
-  console.log(`La probabilidad estimada de duplicidad es aproximadamente ${probability * 100}%.`);
-  
-calculateDuplicateProbability(92,100,4);
-//generateBingoImages();
+generateBingoImages(1);
